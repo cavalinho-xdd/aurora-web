@@ -145,7 +145,7 @@ export default function Layout() {
 
       {/* CTA Footer shared across all pages */}
       <section className="relative py-24 md:py-32 px-4 text-center z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-focus-primary/10 to-transparent z-[-1]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-focus-primary/10 to-transparent z-[-1]" />
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}

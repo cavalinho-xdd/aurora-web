@@ -10,7 +10,7 @@
 }
 
 @layer base {
-  body {
+  html, body {
     @apply bg-focus-bg text-white overflow-x-hidden antialiased;
     font-family: 'Poppins', sans-serif;
   }
