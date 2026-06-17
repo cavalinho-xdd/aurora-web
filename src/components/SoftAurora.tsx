@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const, @typescript-eslint/no-explicit-any */
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface SoftAuroraProps {
   speed?: number;
