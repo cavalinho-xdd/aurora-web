@@ -10,7 +10,7 @@ const downloadLinks = [
     type: ".exe",
     Icon: WindowsIcon,
     iconColor: "text-blue-400",
-    url: "https://github.com/cavalinho-xdd/aurora/releases/download/v1.0.10-alpha.2/Aurora-Setup-1.0.10-alpha.3.exe"
+    url: "https://github.com/cavalinho-xdd/aurora/releases/download/v1.0.10-alpha.3/Aurora-Setup-1.0.10-alpha.3.exe"
   },
   {
     os: "macOS",
