@@ -10,7 +10,7 @@ const downloadLinks = [
     type: ".exe",
     Icon: WindowsIcon,
     iconColor: "text-blue-400",
-    url: "https://github.com/cavalinho-xdd/focus/releases/download/v1.0.6/Focus-Setup-1.0.6.exe"
+    url: "https://github.com/cavalinho-xdd/aurora/releases/download/v1.0.8/Aurora-Setup-1.0.8.exe"
   },
   {
     os: "macOS",
@@ -18,7 +18,7 @@ const downloadLinks = [
     type: ".dmg",
     Icon: AppleIcon,
     iconColor: "text-gray-200",
-    url: "https://github.com/cavalinho-xdd/focus/releases/download/v1.0.6/Focus-1.0.6-arm64.dmg"
+    url: "https://github.com/cavalinho-xdd/aurora/releases/download/v1.0.8/Aurora-1.0.8-arm64.dmg"
   },
   {
     os: "Linux",
@@ -26,7 +26,7 @@ const downloadLinks = [
     type: ".AppImage",
     Icon: LinuxIcon,
     iconColor: "text-yellow-500",
-    url: "https://github.com/cavalinho-xdd/focus/releases/download/v1.0.6/Focus-1.0.6.AppImage"
+    url: "https://github.com/cavalinho-xdd/aurora/releases/download/v1.0.8/Aurora-1.0.8.AppImage"
   },
   {
     os: "Linux",
@@ -34,7 +34,7 @@ const downloadLinks = [
     type: ".deb",
     Icon: LinuxIcon,
     iconColor: "text-yellow-500",
-    url: "https://github.com/cavalinho-xdd/focus/releases/download/v1.0.6/focus_1.0.6_amd64.deb"
+    url: "https://github.com/cavalinho-xdd/aurora/releases/download/v1.0.8/aurora_1.0.8_amd64.deb"
   }
 ];
 
