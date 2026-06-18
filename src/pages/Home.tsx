@@ -84,9 +84,9 @@ export default function Home() {
           className="text-center z-10 flex flex-col items-center max-w-5xl px-4 -translate-y-24 md:-translate-y-32"
         >
           <motion.div
-            initial={initialLoad ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: initialLoad ? 3.2 : 0, duration: initialLoad ? 1.5 : 0 }}
+            initial={initialLoad ? { opacity: 0, y: 20 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: initialLoad ? 0.2 : 0, duration: initialLoad ? 0.8 : 0, ease: "easeOut" }}
             className="mb-6 md:mb-12"
           >
             <h1 className="text-[3.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-tighter leading-none mb-4 flex flex-col items-center overflow-hidden py-4">
@@ -120,7 +120,7 @@ export default function Home() {
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 4.0, duration: 1 }}
+          transition={{ delay: 1.0, duration: 0.8 }}
           className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500"
         >
           <span className="text-xs uppercase tracking-[0.3em]">{t('nav.scroll')}</span>

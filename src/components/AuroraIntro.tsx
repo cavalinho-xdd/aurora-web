@@ -36,22 +36,6 @@ export default function AuroraIntro() {
         )}
       </motion.div>
 
-
-      <motion.div
-        className="absolute top-0 bottom-0 z-10 pointer-events-none"
-        style={{
-          width: "200vw",
-          left: "-150px",
-          background: "linear-gradient(to right, transparent 0px, transparent 50px, #0B0A15 250px, #0B0A15 100%)"
-        }}
-        initial={{ x: "0vw" }}
-        animate={{ x: "100vw" }}
-        transition={{
-          duration: 3.0,
-          ease: "easeInOut"
-        }}
-      />
-
     </div>
   );
 }
