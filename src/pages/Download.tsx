@@ -50,7 +50,7 @@ export default function Download() {
         if (!data.assets) return;
         
         setLinks(prevLinks => prevLinks.map(link => {
-          const matchedAsset = data.assets.find((asset: any) => asset.name.endsWith(link.type));
+          const matchedAsset = data.assets.find((asset: { name: string; browser_download_url: string }) => asset.name.endsWith(link.type));
           if (matchedAsset) {
             return { ...link, url: matchedAsset.browser_download_url };
           }

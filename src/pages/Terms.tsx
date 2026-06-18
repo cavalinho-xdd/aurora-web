@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Scale, AlertTriangle, ShieldAlert, Cpu } from 'lucide-react';
