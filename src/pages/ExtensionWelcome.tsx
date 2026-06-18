@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Settings, Zap, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
