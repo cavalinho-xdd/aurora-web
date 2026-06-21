@@ -1,215 +1,293 @@
-import { useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { Target, ShieldCheck, Brain, Trophy, Timer, Users, DownloadSimple } from '@phosphor-icons/react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Target, LockKey, X } from '@phosphor-icons/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import AppDemo from '../components/AppDemo';
 import ApiGuideModal from '../components/ApiGuideModal';
-import { usePerformanceMode } from '../components/PerformanceContext';
 
-let isFirstLoad = true;
-
-const reveal = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0 },
-};
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const { t } = useTranslation();
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-
-  const [initialLoad] = useState(isFirstLoad);
-  const { isPerformanceMode } = usePerformanceMode();
-  
+  const container = useRef<HTMLDivElement>(null);
   const [isApiGuideOpen, setIsApiGuideOpen] = useState(false);
-
-  const [wordIndex, setWordIndex] = useState(0);
-  const words = ["focused", "calm", "organized", "unstoppable"];
+  const [timeLeft, setTimeLeft] = useState(13 * 60 + 24); // 13:24
 
   useEffect(() => {
-    isFirstLoad = false;
-    const interval = setInterval(() => {
-      setWordIndex((prev) => (prev + 1) % words.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [words.length]);
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Hero animations
+      gsap.from('.hero-word', {
+        y: 80,
+        opacity: 0,
+        stagger: 0.05,
+        duration: 1.5,
+        ease: 'expo.out',
+        delay: 0.1,
+      });
+
+      // Feature reveals
+      const features = gsap.utils.toArray('.feature-section');
+      (features as HTMLElement[]).forEach((feature) => {
+        gsap.from(feature, {
+          scrollTrigger: {
+            trigger: feature,
+            start: 'top 75%',
+            toggleActions: 'play none none none',
+          },
+          y: 60,
+          opacity: 0,
+          duration: 1.2,
+          ease: 'expo.out'
+        });
+      });
+
+      // Sub-elements stagger within features
+      (features as HTMLElement[]).forEach((feature) => {
+        const elements = feature.querySelectorAll('.stagger-el');
+        if (elements.length > 0) {
+          gsap.from(elements, {
+            scrollTrigger: {
+              trigger: feature,
+              start: 'top 75%',
+            },
+            y: 30,
+            opacity: 0,
+            stagger: 0.05,
+            duration: 1,
+            ease: 'power3.out',
+            delay: 0.2
+          });
+        }
+      });
+
+      // Pulse animation for +8 card
+      gsap.to('.pulse-card', {
+        scale: 1.05,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      // Breathing pulse for Timer
+      gsap.to('.breathing-pulse', {
+        scale: 1.05,
+        duration: 2,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      // Floating animation for Hardcore lock
+      gsap.to('.floating-icon', {
+        y: -15,
+        duration: 3,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+      });
+
+      // Number counter for 96
+      gsap.to({ value: 0 }, {
+        value: 96,
+        duration: 2.5,
+        ease: 'expo.out',
+        scrollTrigger: {
+          trigger: '.score-counter',
+          start: 'top 85%',
+        },
+        onUpdate: function () {
+          const el = document.querySelector('.score-counter');
+          if (el) el.innerHTML = Math.round(this.targets()[0].value).toString();
+        }
+      });
+    });
+
+    mm.add("(prefers-reduced-motion: reduce)", () => {
+      gsap.from('.hero-word', { opacity: 0, duration: 1, stagger: 0.05 });
+      const features = gsap.utils.toArray('.feature-section');
+      (features as HTMLElement[]).forEach((feature) => {
+        gsap.from(feature, { scrollTrigger: { trigger: feature, start: 'top 75%' }, opacity: 0, duration: 1 });
+        const elements = feature.querySelectorAll('.stagger-el');
+        if (elements.length > 0) {
+          gsap.from(elements, { scrollTrigger: { trigger: feature, start: 'top 75%' }, opacity: 0, duration: 1, stagger: 0.05 });
+        }
+      });
+      gsap.to({ value: 0 }, {
+        value: 96, duration: 2.5,
+        scrollTrigger: { trigger: '.score-counter', start: 'top 85%' },
+        onUpdate: function () {
+          const el = document.querySelector('.score-counter');
+          if (el) el.innerHTML = Math.round(this.targets()[0].value).toString();
+        }
+      });
+    });
+
+  }, { scope: container });
 
   return (
-    <>
-      {/* ─── HERO ─── */}
-      <section className="relative min-h-[100dvh] flex flex-col items-center justify-center overflow-hidden pt-20">
-        <motion.div 
-          style={{ y, opacity }}
-          className="text-center z-10 flex flex-col items-center max-w-5xl px-4 -translate-y-24 md:-translate-y-32"
-        >
-          <motion.div
-            initial={initialLoad ? { opacity: 0, scale: 0.95 } : { opacity: 1, scale: 1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: initialLoad ? 0.2 : 0, duration: initialLoad ? 0.8 : 0, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-6 md:mb-12"
-          >
-            <h1 className="text-[2.5rem] sm:text-[3.5rem] md:text-[5.5rem] lg:text-[7rem] font-black tracking-tighter leading-[1.05] mb-4 flex flex-col items-center overflow-hidden py-4">
-              <motion.div layout className="text-white flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-3 md:gap-x-5 gap-y-1 sm:gap-y-2">
-                <motion.span layout>Stay</motion.span> 
-                <AnimatePresence mode="popLayout">
-                  <motion.span
-                    layout
-                    key={wordIndex}
-                    initial={{ y: 30, opacity: 0, filter: isPerformanceMode ? "none" : "blur(8px)" }}
-                    animate={{ y: 0, opacity: 1, filter: isPerformanceMode ? "none" : "blur(0px)" }}
-                    exit={{ y: -30, opacity: 0, filter: isPerformanceMode ? "none" : "blur(8px)" }}
-                    transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-                    className="text-focus-primary inline-block"
-                  >
-                    {words[wordIndex]}
-                  </motion.span>
-                </AnimatePresence>
-                <motion.span layout>with</motion.span>
-              </motion.div>
-              <motion.span layout className={`text-focus-primary mt-1 md:mt-0 text-[3.5rem] sm:text-[4.5rem] md:text-[9rem] lg:text-[11rem] leading-none ${isPerformanceMode ? '' : 'drop-shadow-[0_0_50px_rgba(139,92,246,0.3)]'}`}>
-                aurora.
-              </motion.span>
-            </h1>
-            <p className="text-lg sm:text-xl md:text-3xl text-gray-400 font-light tracking-wide mt-4 sm:mt-6 mb-8 sm:mb-10 md:mb-12">
-              "Light up your mind."
-            </p>
-            <motion.div
-              initial={initialLoad ? { opacity: 0, y: 10 } : { opacity: 1, y: 0 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: initialLoad ? 1.0 : 0.2, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <Link 
-                to="/download"
-                className="pressable inline-flex items-center gap-3 px-8 md:px-10 py-4 md:py-5 rounded-full bg-focus-primary/20 text-white font-bold text-lg md:text-xl border border-focus-primary/50 shadow-[0_0_30px_rgba(139,92,246,0.3)] hover:shadow-[0_0_50px_rgba(139,92,246,0.5)] hover:bg-focus-primary transition-[transform,background-color,box-shadow,border-color] focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0A15]"
-              >
-                <DownloadSimple weight="bold" className="w-6 h-6 md:w-7 md:h-7" />
-                {t('nav.download')}
-              </Link>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+    <div ref={container} className="w-full relative overflow-x-hidden pb-16">
+      {/* HERO SECTION */}
+      <section className="relative min-h-[70vh] flex flex-col items-center justify-center pt-20 px-4">
+        <div className="max-w-6xl mx-auto text-center z-10 w-full flex flex-col items-center">
+          <h1 className="text-[clamp(3.5rem,8vw,8rem)] font-black tracking-tighter leading-[1.05] mb-8 overflow-hidden py-4 text-balance text-white">
+             <span className="hero-word">{t('homeNew.title1')} </span>
+             <span className="hero-word">{t('homeNew.title2')} </span>
+             <span className="hero-word">{t('homeNew.title3')} </span>
+             <span className="hero-word text-gradient pb-2 drop-shadow-2xl">{t('homeNew.title4')}</span>
+          </h1>
+          <p className="hero-word text-2xl md:text-4xl text-gray-400 font-light tracking-wide max-w-2xl mx-auto">
+            {t('homeNew.subtitle')}
+          </p>
+        </div>
       </section>
 
-      {/* ─── FEATURES ─── Asymmetric Bento Grid */}
-      <section className="relative min-h-screen py-16 md:py-32 px-6 md:px-16 max-w-7xl mx-auto z-10">
-        <motion.div 
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          variants={reveal}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-16 md:mb-24"
-        >
-          <h2 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
-            {t('features.title')} <span className="text-focus-primary">{t('features.titleHighlight')}</span>.
-          </h2>
-          <p className="text-xl md:text-2xl text-gray-400 font-light max-w-2xl mx-auto leading-relaxed">
-            {t('features.subtitle')}
+      {/* SYSTEM BLOCKER */}
+      <section className="feature-section relative max-w-7xl mx-auto px-4 md:px-16 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12 md:gap-24 z-10">
+        <div className="flex-1 space-y-8 text-left">
+          <div className="stagger-el w-16 h-16 rounded-full border border-focus-primary/30 flex items-center justify-center bg-focus-primary/10">
+            <Target className="w-8 h-8 text-focus-primary" weight="duotone" />
+          </div>
+          <h2 className="stagger-el text-5xl md:text-7xl font-bold tracking-tight">{t('features.blocker') || 'System Blocker'}</h2>
+          <p className="stagger-el text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-2xl">
+            {t('features.blockerDesc') || "Mercilessly terminates distracting applications. No Discord, no games. It's time to focus."}
           </p>
-        </motion.div>
+        </div>
+        
+        <div className="flex-1 w-full flex justify-center md:justify-end stagger-el">
+          <div className="relative group cursor-default">
+            <div className="text-center mb-8">
+              <span className="text-xs md:text-sm font-bold tracking-[0.2em] text-focus-secondary uppercase">{t('homeNew.appsBlocked')}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-200 ease-out">
+                  <X className="w-10 h-10 md:w-12 md:h-12 text-focus-secondary" weight="bold" />
+                </div>
+              ))}
+              <div className="pulse-card w-24 h-24 md:w-32 md:h-32 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                 <span className="font-mono text-2xl md:text-3xl font-bold text-gray-400">+8</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* 1. Blocker - Large square */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="md:col-span-2 md:row-span-2 relative group rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-focus-primary/40 transition-colors duration-500 overflow-hidden shadow-[0_0_60px_rgba(139,92,246,0.05)] p-10 md:p-16 flex flex-col justify-end min-h-[400px] md:min-h-[500px]"
-          >
-            <div className="absolute top-10 right-10 w-48 h-48 lg:w-64 lg:h-64 flex items-center justify-center rounded-full bg-focus-primary/5 blur-[80px] pointer-events-none group-hover:bg-focus-primary/10 transition-colors duration-700" />
-            <Target weight="light" className="w-16 h-16 text-focus-primary mb-8" />
-            <h3 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-white">
-              {t('features.blocker')}
-            </h3>
-            <p className="text-lg md:text-xl text-gray-400 font-light leading-relaxed max-w-lg">
-              {t('features.blockerDesc')}
-            </p>
-          </motion.div>
+      {/* HARDCORE MODE */}
+      <section className="feature-section relative max-w-5xl mx-auto px-4 md:px-16 py-20 md:py-28 flex flex-col items-center justify-center text-center z-10">
+         <div className="stagger-el mb-12 relative group cursor-default">
+            <div className="absolute inset-0 bg-focus-secondary/20 blur-3xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <LockKey className="floating-icon w-32 h-32 md:w-40 md:h-40 text-focus-secondary relative z-10" weight="duotone" />
+         </div>
+         <span className="stagger-el text-xs md:text-sm font-bold tracking-[0.2em] text-focus-secondary uppercase mb-8 bg-focus-secondary/10 px-6 py-2 rounded-full border border-focus-secondary/20">
+            {t('homeNew.irreversible')}
+         </span>
+         <h2 className="stagger-el text-5xl md:text-[5rem] font-bold tracking-tight mb-8 leading-none">
+            {t('features.hardcore') || 'Hardcore Mode'}
+         </h2>
+         <p className="stagger-el text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-4xl">
+            {t('features.hardcoreDesc') || 'When things get tough. If you activate Hardcore mode, the app cannot be closed in any way.'}
+         </p>
+      </section>
 
-          {/* 2. Hardcore Mode - Standard card */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: 0.05, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-focus-primary/40 transition-colors duration-500 p-8 flex flex-col items-start shadow-[0_0_40px_rgba(139,92,246,0.03)]"
-          >
-            <ShieldCheck weight="light" className="w-12 h-12 text-focus-primary mb-6" />
-            <h3 className="text-2xl font-bold tracking-tight mb-3 text-white">{t('features.hardcore')}</h3>
-            <p className="text-base text-gray-400 font-light leading-relaxed">{t('features.hardcoreDesc')}</p>
-          </motion.div>
-
-          {/* 3. AI Evaluation - Interactive standard card */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-focus-primary/40 transition-colors duration-500 p-8 flex flex-col items-start shadow-[0_0_40px_rgba(139,92,246,0.03)]"
-          >
-            <Brain weight="light" className="w-12 h-12 text-focus-primary mb-6" />
-            <h3 className="text-2xl font-bold tracking-tight mb-3 text-white">{t('features.ai')}</h3>
-            <p className="text-base text-gray-400 font-light leading-relaxed flex-1 mb-6">{t('features.aiDesc')}</p>
-            <button
+      {/* AI EVALUATION */}
+      <section className="feature-section relative max-w-7xl mx-auto px-4 md:px-16 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12 md:gap-24 z-10">
+        <div className="flex-1 space-y-8 text-left">
+          <h2 className="stagger-el text-5xl md:text-7xl font-bold tracking-tight">{t('features.ai') || 'AI Evaluation'}</h2>
+          <p className="stagger-el text-xl md:text-3xl text-gray-400 font-light leading-relaxed max-w-2xl">
+            {t('features.aiDesc') || 'After the session, Google Gemini will test what you learned. Earn a rating and XP.'}
+          </p>
+          <div className="stagger-el pt-4">
+            <button 
               onClick={() => setIsApiGuideOpen(true)}
-              className="pressable w-full py-3 bg-focus-primary/10 border border-focus-primary/30 text-white rounded-xl font-bold hover:bg-focus-primary transition-colors flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-focus-primary focus-visible:ring-offset-2 focus-visible:ring-offset-focus-bg"
+              className="bg-focus-primary text-white font-bold rounded-full px-8 py-4 shadow-[0_0_24px_rgba(139,92,246,0.25)] hover:shadow-[0_0_40px_rgba(139,92,246,0.35)] transition-shadow duration-300 active:scale-95 flex items-center gap-2"
             >
-              <Target weight="bold" className="w-4 h-4" />
               {t('apiGuide.button')}
             </button>
-          </motion.div>
+          </div>
+        </div>
+        
+        <div className="flex-1 w-full flex justify-center md:justify-end stagger-el">
+           <div className="flex flex-col items-center group cursor-default">
+              <span className="text-sm font-bold tracking-[0.2em] text-focus-accent uppercase mb-4">{t('homeNew.sessionScore')}</span>
+              <div className="flex items-baseline gap-2 group-hover:scale-105 transition-transform duration-200 ease-out origin-bottom">
+                 <span className="score-counter font-mono text-[clamp(6rem,12vw,14rem)] font-black leading-none tracking-tighter text-white">0</span>
+                 <span className="font-mono text-[clamp(2rem,4vw,5rem)] text-gray-500 font-bold">/ 100</span>
+              </div>
+           </div>
+        </div>
+      </section>
 
-          {/* 4. Gamification */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-focus-primary/40 transition-colors duration-500 p-8 flex flex-col items-start shadow-[0_0_40px_rgba(139,92,246,0.03)]"
-          >
-            <Trophy weight="light" className="w-12 h-12 text-focus-primary mb-6" />
-            <h3 className="text-2xl font-bold tracking-tight mb-3 text-white">{t('features.gamification')}</h3>
-            <p className="text-base text-gray-400 font-light leading-relaxed">{t('features.gamificationDesc')}</p>
-          </motion.div>
+      {/* POMODORO & DOMINATE */}
+      <section className="feature-section relative max-w-7xl mx-auto px-4 md:px-16 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12 md:gap-24 z-10">
+        <div className="flex-1 flex flex-col gap-12 w-full pr-0 md:pr-16">
+           <div className="stagger-el flex items-center gap-8 group cursor-default">
+              <div className="breathing-pulse w-24 h-24 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors duration-200">
+                 <span className="font-mono text-2xl font-bold text-white group-hover:text-black">
+                   {formatTime(timeLeft)}
+                 </span>
+              </div>
+              <div>
+                 <h3 className="text-2xl font-bold mb-2">{t('homeNew.pomodoroTitle')}</h3>
+                 <p className="text-gray-400 text-base max-w-xs leading-relaxed">{t('homeNew.pomodoroDesc')}</p>
+              </div>
+           </div>
+           
+           <div className="stagger-el h-px w-full bg-white/10"></div>
 
-          {/* 5. Social Contracts */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-focus-primary/40 transition-colors duration-500 p-8 flex flex-col items-start shadow-[0_0_40px_rgba(139,92,246,0.03)]"
-          >
-            <Users weight="light" className="w-12 h-12 text-focus-primary mb-6" />
-            <h3 className="text-2xl font-bold tracking-tight mb-3 text-white">{t('features.social')}</h3>
-            <p className="text-base text-gray-400 font-light leading-relaxed">{t('features.socialDesc')}</p>
-          </motion.div>
-
-          {/* 6. Pomodoro - Wide rectangle */}
-          <motion.div 
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.2 }}
-            transition={{ duration: 0.5, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="md:col-span-2 rounded-3xl bg-black/40 backdrop-blur-2xl border border-white/10 hover:border-focus-primary/40 transition-colors duration-500 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 shadow-[0_0_40px_rgba(139,92,246,0.03)]"
-          >
-            <Timer weight="light" className="w-16 h-16 text-focus-primary shrink-0" />
-            <div>
-              <h3 className="text-2xl md:text-3xl font-bold tracking-tight mb-3 text-white">{t('features.pomodoro')}</h3>
-              <p className="text-base md:text-lg text-gray-400 font-light leading-relaxed max-w-xl">{t('features.pomodoroDesc')}</p>
-            </div>
-          </motion.div>
+           <div className="stagger-el flex items-center gap-8 group cursor-default">
+              <div className="flex-1">
+                 <h3 className="text-2xl font-bold mb-3">{t('homeNew.gamificationTitle')}</h3>
+                 <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      <div className="w-5 h-5 rounded-full bg-focus-primary shadow-[0_0_10px_rgba(139,92,246,0.6)]"></div>
+                      <div className="w-5 h-5 rounded-full bg-focus-accent shadow-[0_0_10px_rgba(14,165,233,0.6)]"></div>
+                      <div className="w-5 h-5 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]"></div>
+                    </div>
+                    <span className="text-sm text-gray-500 ml-2 font-medium">
+                      <span className="font-mono">3</span> {t('homeNew.streakToday')}
+                    </span>
+                 </div>
+              </div>
+              <div className="flex flex-col items-center justify-center shrink-0">
+                 <span className="text-sm text-gray-500 font-bold tracking-widest">{t('homeNew.lvl')}</span>
+                 <span className="font-mono text-[3.5rem] font-black leading-none mt-1 text-white">7</span>
+              </div>
+           </div>
+        </div>
+        
+        <div className="flex-1 text-left md:text-right mt-16 md:mt-0">
+           <h2 className="stagger-el text-[clamp(4rem,7vw,7rem)] font-black tracking-tighter leading-[1] mb-8">
+              {t('homeNew.dominateTitle1')}<br/>{t('homeNew.dominateTitle2')}
+           </h2>
+           <p className="stagger-el text-xl md:text-2xl text-gray-400 font-light leading-relaxed max-w-lg ml-auto">
+              {t('homeNew.dominateDesc')}
+           </p>
         </div>
       </section>
 
       <ApiGuideModal isOpen={isApiGuideOpen} onClose={() => setIsApiGuideOpen(false)} />
 
-      <section className="relative w-full z-20 py-20">
+      <section className="relative w-full z-20 py-16 px-4 mt-16">
         <AppDemo />
       </section>
-    </>
+    </div>
   );
 }

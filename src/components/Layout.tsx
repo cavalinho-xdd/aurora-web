@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from 'framer-motion';
-import { List, X, Lightning, Heart, Coffee } from '@phosphor-icons/react';
+import { Menu, X, Zap, Heart, Coffee } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import AuroraIntro from './AuroraIntro';
@@ -82,7 +82,7 @@ export default function Layout() {
               className={`p-2 rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center justify-center ${isPerformanceMode ? 'bg-focus-primary/20 text-focus-primary' : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}
               title="Performance Mode"
             >
-              <Lightning weight="bold" className="w-5 h-5" />
+              <Zap className="w-5 h-5" />
             </button>
             <div className="relative">
               <button 
@@ -134,7 +134,7 @@ export default function Layout() {
             onClick={togglePerformanceMode}
             className={`p-2 rounded-full backdrop-blur-md border border-white/10 transition-all flex items-center justify-center ${isPerformanceMode ? 'bg-focus-primary/20 text-focus-primary' : 'bg-white/5 text-gray-400'}`}
           >
-            <Lightning weight="bold" className="w-5 h-5" />
+            <Zap className="w-5 h-5" />
           </button>
           <button 
             onClick={() => changeLang(i18n.language.startsWith('en') ? 'cs' : 'en')}
@@ -146,7 +146,7 @@ export default function Layout() {
             onClick={() => setMobileMenuOpen(true)}
             className="p-2 rounded-full bg-white/5 backdrop-blur-md border border-white/10 hover:bg-white/10 transition-all"
           >
-            <List weight="bold" className="w-6 h-6 text-white" />
+            <Menu className="w-6 h-6 text-white" />
           </button>
         </div>
       </motion.nav>
@@ -164,7 +164,7 @@ export default function Layout() {
               onClick={() => setMobileMenuOpen(false)}
               className="absolute top-6 right-4 p-2 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
             >
-              <X weight="bold" className="w-6 h-6 text-white" />
+              <X className="w-6 h-6 text-white" />
             </button>
 
             <div className="flex flex-col items-center gap-8 text-2xl font-light">
@@ -209,8 +209,8 @@ export default function Layout() {
           viewport={{ once: true }}
           className="relative max-w-4xl mx-auto"
         >
-          <h2 className="text-4xl md:text-7xl font-bold mb-8">
-            {t('footer.ready', 'Ready for')} <span className="text-gradient">aurora</span>?
+          <h2 className="text-4xl md:text-7xl font-bold mb-8 text-white">
+            {t('footer.ready', 'Ready for')} <span className="text-gradient pb-2 drop-shadow-2xl">aurora</span>?
           </h2>
           <Link to="/download">
             <motion.button 
@@ -265,7 +265,7 @@ export default function Layout() {
           <div className="absolute inset-0 bg-gradient-to-r from-focus-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <div className="flex flex-col gap-3 max-w-2xl relative z-10">
             <h4 className="text-white font-bold flex items-center gap-2 text-lg">
-              <Heart weight="fill" className="w-5 h-5 text-focus-primary fill-focus-primary/20" />
+              <Heart className="w-5 h-5 text-focus-primary fill-focus-primary/20" />
               {t('footer.supportTitle', "Support Aurora's Development")}
             </h4>
             <p className="text-gray-400 text-sm leading-relaxed">
@@ -278,7 +278,7 @@ export default function Layout() {
             rel="noopener noreferrer"
             className="relative z-10 px-8 py-3 rounded-full bg-focus-primary/10 hover:bg-focus-primary/20 border border-focus-primary/30 text-focus-primary font-bold text-sm transition-all whitespace-nowrap flex items-center gap-2 shadow-glow-secondary hover:shadow-glow-secondary-lg"
           >
-            <Coffee weight="bold" className="w-4 h-4" />
+            <Coffee className="w-4 h-4" />
             {t('footer.supportBtn', 'Support on Ko-fi')}
           </a>
         </div>

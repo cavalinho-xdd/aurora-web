@@ -1,21 +1,20 @@
 @import "tailwindcss";
 
 @theme {
-  --color-focus-bg: #0B0A15;
+  --color-focus-bg: #0c0b18;
   --color-focus-primary: #8B5CF6;
   --color-focus-secondary: #EC4899;
   --color-focus-accent: #0EA5E9;
   
-  --font-sans: 'Poppins', sans-serif;
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'SF Mono', monospace;
 
   --shadow-glow-primary: 0 0 30px rgba(139, 92, 246, 0.3);
   --shadow-glow-primary-lg: 0 0 50px rgba(139, 92, 246, 0.4);
+  --shadow-glow-secondary: 0 0 30px rgba(236, 72, 153, 0.3);
   --shadow-glow-secondary-lg: 0 0 50px rgba(236, 72, 153, 0.4);
   --shadow-glow-white: 0 0 20px rgba(255, 255, 255, 0.2);
   --shadow-glow-white-lg: 0 0 40px rgba(255, 255, 255, 0.4);
-
-  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @layer base {
@@ -24,45 +23,23 @@
   }
   body {
     @apply text-white overflow-x-hidden antialiased;
-    font-family: 'Poppins', sans-serif;
+    font-family: var(--font-sans);
   }
 }
 
 @layer utilities {
+
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-focus-primary to-focus-secondary;
+    background-image: linear-gradient(to right, var(--color-focus-primary), var(--color-focus-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
-  
-  .glass-card {
-    /* Minimalist glass, not overly intrusive */
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    border-radius: 1.5rem; /* rounded-3xl standard */
-  }
-  
+
   .glow-border {
     border: 1px solid rgba(139, 92, 246, 0.3);
     box-shadow: 0 0 15px rgba(139, 92, 246, 0.1), inset 0 0 10px rgba(139, 92, 246, 0.05);
-  }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  .pressable {
-    transition: transform 160ms var(--ease-out), filter 200ms ease, opacity 200ms ease;
-  }
-  .pressable:active {
-    transform: scale(0.97);
-  }
-  .pressable.transitioning {
-    filter: blur(2px);
-    opacity: 0.7;
   }
 }
 
@@ -104,10 +81,7 @@
   pointer-events: none;
 }
 
-body.performance-mode .glass-card {
-  backdrop-filter: none;
-  background: rgba(255, 255, 255, 0.05);
-}
+
 
 body.performance-mode .glow-border {
   box-shadow: none;
